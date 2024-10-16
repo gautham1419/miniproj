@@ -1,8 +1,7 @@
-// app/login/page.js
-"use client"; // Make sure to use "use client" for client-side rendering
+"use client"; // Important for using state and effects in this component
 
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase'; // Ensure the correct path to your supabase.js file
+import { supabase } from '../../lib/supabase'; // Adjust the path according to your project structure
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false);
@@ -23,17 +22,21 @@ const LoginPage = () => {
             setError('Error logging in, please try again.');
         } else {
             console.log('Login successful!');
-            window.location.href = '/sell-ewaste'; // Redirect after successful login
+            window.location.href = '/sell-ewaste'; // Adjust if necessary
         }
     };
 
     return (
-        <div>
-            <h1>Login</h1>
-            <button onClick={handleLogin} disabled={loading}>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <h1 className="text-4xl font-bold mb-6">Login Page</h1>
+            <button 
+                onClick={handleLogin} 
+                disabled={loading} 
+                className="bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded"
+            >
                 {loading ? 'Logging in...' : 'Login with Google'}
             </button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
         </div>
     );
 };

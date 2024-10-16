@@ -7,6 +7,7 @@ export default function SellEWastePage() {
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [image, setImage] = useState(null); // File input for image
+  const [message, setMessage] = useState(''); // State for success message
 
   const handleFileChange = (e) => {
     setImage(e.target.files[0]); // Set the selected file to state
@@ -35,7 +36,20 @@ export default function SellEWastePage() {
       console.error('Error inserting data:', error);
     } else {
       console.log('Item added:', data);
+      setMessage('Item Listed!'); // Set success message
+      resetForm(); // Reset the form fields
     }
+  };
+
+  const resetForm = () => {
+    setItemName('');
+    setItemDescription('');
+    setImage(null);
+    
+    // Show the message for 3 seconds
+    setTimeout(() => {
+      setMessage(''); // Clear message after 3 seconds
+    }, 3000);
   };
 
   return (
@@ -47,6 +61,11 @@ export default function SellEWastePage() {
       <p className="text-xl mb-6 text-gray-700">
         Contribute to a cleaner environment by selling your unwanted electronic devices. Fill out the form below to get started.
       </p>
+
+      {/* Success Message */}
+      {message && (
+        <div className="mb-4 text-green-600 text-xl font-semibold">{message}</div>
+      )}
 
       {/* Form */}
       <form className="space-y-6 bg-white p-10 shadow-lg rounded-lg" onSubmit={handleSubmit}>

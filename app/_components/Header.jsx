@@ -6,15 +6,20 @@ import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation'; // Import useRouter
 import { Plus } from 'lucide-react';
 
 function Header() {
   const path = usePathname();
+  const router = useRouter(); // Initialize useRouter
 
   useEffect(() => {
     console.log(path);
   }, [path]);
+
+  const handleLoginClick = () => {
+    router.push('/login'); // Redirects to the Login page
+  };
 
   return (
     <div className='p-4 px-8 flex justify-between shadow-sm fixed top-0 w-full z-10 bg-white border-b border-green-200'>
@@ -43,7 +48,11 @@ function Header() {
         <Button className="flex gap-2 bg-green-600 text-white hover:bg-green-700 px-4 py-2 text-lg">
           <Plus />Post Your Ad
         </Button>
-        <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-100 px-4 py-2 text-lg">
+        <Button 
+          variant="outline" 
+          className="border-green-600 text-green-600 hover:bg-green-100 px-4 py-2 text-lg"
+          onClick={handleLoginClick} // Attach click handler here
+        >
           Login
         </Button>
       </div>

@@ -1,17 +1,25 @@
-// app/home/page.js
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+"use client";
 
-export default function Home() {
-  const router = useRouter();
+import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from 'next/navigation';
+
+export default function home() {
+  const path = usePathname();
+  const router = useRouter(); // Initialize useRouter
+
+  useEffect(() => {
+    console.log(path);
+  }, [path]);
+
 
   const handleSellClick = () => {
-    router.push('/sell-ewaste'); // Redirects to the Sell E-Waste page
+    console.log("Sell button clicked"); 
+    router.push('/login'); // Redirects to the Login page
   };
 
   const handleBuyClick = () => {
     // Redirect logic for Buy E-Waste page can be added here
-    // Example: router.push('/buy-ewaste');
+    router.push('/login');
   };
 
   return (
