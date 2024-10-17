@@ -1,19 +1,43 @@
 // app/page.js
 
-"use client"; // This indicates that this is a Client Component
-
+"use client"; // This is a Client Component
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button"; // Assuming you have a custom Button component
 import { useRouter } from "next/navigation"; // For navigation handling
+import { auth } from "@/lib/firebase"; // Import Firebase auth
+import { onAuthStateChanged } from "firebase/auth"; // Firebase method to track auth state
 
 export default function Home() {
   const router = useRouter();
+  const [user, setUser] = useState(null);
 
+  // Track the authentication state of the user
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser); // User is logged in
+      } else {
+        setUser(null); // No user is logged in
+      }
+    });
+    
+    return () => unsubscribe(); // Clean up listener on component unmount
+  }, []);
+
+  // Handle Sell button click
   const handleSellClick = () => {
-    router.push('/sell-ewaste'); // Redirects to the Sell E-Waste page
+    if (user) {
+      // User is logged in, go to the Sell E-Waste form
+      router.push('/sell-ewaste');
+    } else {
+      // User is not logged in, redirect to Login page
+      router.push('/login');
+    }
   };
 
+  // Handle Buy button click (this could remain as-is)
   const handleBuyClick = () => {
-    router.push('/buy-ewaste'); // Redirects to the Buy E-Waste page
+    router.push('/buy-ewaste');
   };
 
   return (

@@ -1,55 +1,40 @@
 "use client"; // Ensure this component is treated as a Client Component
 
 import React, { useState } from 'react';
-import { supabase } from '../../lib/supabase'; // Make sure this path is correct
+import { supabase } from '../../lib/supabase'; // Ensure the path is correct
+import SellerForm from '../_components/SellerForm'; // Adjust path as necessary
 
 export default function SellEWastePage() {
-  const [itemName, setItemName] = useState('');
-  const [itemDescription, setItemDescription] = useState('');
-  const [image, setImage] = useState(null); // File input for image
   const [message, setMessage] = useState(''); // State for success message
 
-  const handleFileChange = (e) => {
-    setImage(e.target.files[0]); // Set the selected file to state
-  };
+  // Form submit callback function
+  const handleSubmit = async (itemName, itemDescription, imageUrl) => {
+    try {
+      // **Changes: Console log to debug**
+      console.log('Attempting to insert item:', { itemName, itemDescription, imageUrl });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+      const { data, error } = await supabase.from('item').insert([
+        { 
+          item_name: itemName, 
+          item_desc: itemDescription, 
+          item_img: imageUrl ? imageUrl : '' 
+        },
+      ]);
 
-    // Upload image to Supabase storage (optional)
-    let imageUrl = '';
-    if (image) {
-      const { data, error } = await supabase.storage.from('images').upload(`public/${image.name}`, image);
       if (error) {
-        console.error('Error uploading image:', error);
-        return;
+        console.error('Error inserting data into Supabase:', error);  // Log the exact error
+        setMessage('Failed to list item!');
+        return { success: false };
+      } else {
+        console.log('Item added:', data);
+        setMessage('Item Listed!');
+        return { success: true };
       }
-      imageUrl = data.Key; // Get the URL of the uploaded image
+    } catch (e) {
+      console.error('Unexpected error during insert:', e);  // Catch unexpected errors
+      setMessage('Unexpected error occurred!');
+      return { success: false };
     }
-
-    // Insert the item details into the Supabase 'items' table
-    const { data, error } = await supabase.from('items').insert([
-      { name: itemName, description: itemDescription, image_url: imageUrl },
-    ]);
-
-    if (error) {
-      console.error('Error inserting data:', error);
-    } else {
-      console.log('Item added:', data);
-      setMessage('Item Listed!'); // Set success message
-      resetForm(); // Reset the form fields
-    }
-  };
-
-  const resetForm = () => {
-    setItemName('');
-    setItemDescription('');
-    setImage(null);
-    
-    // Show the message for 3 seconds
-    setTimeout(() => {
-      setMessage(''); // Clear message after 3 seconds
-    }, 3000);
   };
 
   return (
@@ -62,51 +47,15 @@ export default function SellEWastePage() {
         Contribute to a cleaner environment by selling your unwanted electronic devices. Fill out the form below to get started.
       </p>
 
-      {/* Success Message */}
+      {/* Success/Failure Message */}
       {message && (
-        <div className="mb-4 text-green-600 text-xl font-semibold">{message}</div>
+        <div className={`mb-4 text-xl font-semibold ${message.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>
+          {message}
+        </div>
       )}
 
-      {/* Form */}
-      <form className="space-y-6 bg-white p-10 shadow-lg rounded-lg" onSubmit={handleSubmit}>
-        <div>
-          <label className="block text-lg font-medium text-green-800">Item Name</label>
-          <input 
-            type="text" 
-            className="border border-green-300 rounded w-full p-4 text-lg focus:outline-none focus:border-green-500"
-            placeholder="Enter the name of your item"
-            value={itemName} // Bind state
-            onChange={(e) => setItemName(e.target.value)} // Update state
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium text-green-800">Item Description</label>
-          <textarea 
-            className="border border-green-300 rounded w-full p-4 text-lg focus:outline-none focus:border-green-500" 
-            placeholder="Describe your item"
-            value={itemDescription} // Bind state
-            onChange={(e) => setItemDescription(e.target.value)} // Update state
-            required
-          ></textarea>
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium text-green-800">Upload Image</label>
-          <input 
-            type="file" 
-            className="border border-green-300 rounded w-full p-4 text-lg focus:outline-none focus:border-green-500" 
-            onChange={handleFileChange} // Update state with file
-          />
-        </div>
-
-        <button 
-          type="submit" 
-          className="bg-green-600 text-white rounded-lg px-6 py-4 text-xl hover:bg-green-700 focus:outline-none">
-          Sell
-        </button>
-      </form>
+      {/* Seller Form Component */}
+      <SellerForm onSubmit={handleSubmit} />
     </div>
   );
 }
